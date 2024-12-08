@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model companies {
+  id        Int         @id @default(autoincrement())
+  name      String
+  ppvs      ppvs[]
+  wrestlers wrestlers[]
+}
+
+model matches {
+  id                                    Int         @id @default(autoincrement())
+  titleDefense                          Boolean
+  title                                 String
+  mainEvent                             Boolean
+  ppvId                                 Int
+  winnerId                              Int?
+  ppvs                                  ppvs        @relation(fields: [ppvId], references: [id])
+  wrestlers_matches_winnerIdTowrestlers wrestlers?  @relation("matches_winnerIdTowrestlers", fields: [winnerId], references: [id])
+  wrestlers_MatchWrestlers              wrestlers[] @relation("MatchWrestlers")
+}
+
+model ppvs {
+  id        Int       @id @default(autoincrement())
+  companyId Int
+  ppv_type  String
+  ppv_name  String
+  ppv       Boolean
+  location  String
+  matches   matches[]
+  companies companies @relation(fields: [companyId], references: [id])
+}
+
+model wrestlers {
+  id                                  Int       @id @default(autoincrement())
+  name                                String
+  wrestlerCompanyId                   Int
+  matches_matches_winnerIdTowrestlers matches[] @relation("matches_winnerIdTowrestlers")
+  companies                           companies @relation(fields: [wrestlerCompanyId], references: [id])
+  matches_MatchWrestlers              matches[] @relation("MatchWrestlers")
+}
