@@ -14,7 +14,6 @@ export default function CreateMatch({ wrestlers }: IProps) {
   const [selectedWrestlers, setSelectedWrestlers] = useState(
     Array(howManyWrestlers).fill(null), // Inicjujemy stan jako tablica `null`
   );
-  const [winner, setWinner] = useState("");
 
   const wrestlersList = wrestlers.map((wrestler) => {
     return { value: wrestler.id.toString(), label: wrestler.name };
@@ -78,14 +77,6 @@ export default function CreateMatch({ wrestlers }: IProps) {
           />
         </div>
       ))}
-      <Select
-        label="Winner"
-        placeholder="John Cena"
-        data={wrestlersList}
-        searchable
-        value={winner}
-        onChange={(value) => {}}
-      />
     </div>
   );
 }

@@ -10,7 +10,6 @@ import prisma from "@/lib/db";
 
 export default async function Home() {
   const companies = await prisma.companies.findMany();
-  const wrestlers = await prisma.wrestlers.findMany();
 
   return (
     <AppShell header={{ height: 60 }} padding="md">
@@ -20,7 +19,7 @@ export default async function Home() {
         </Group>
       </AppShellHeader>
       <AppShellMain>
-        <CreatePPV companies={companies} wrestlers={wrestlers} />
+        <CreatePPV companies={companies} />
       </AppShellMain>
     </AppShell>
   );

@@ -1,37 +1,16 @@
 "use client";
 
 import { useForm } from "@mantine/form";
-import {
-  TextInput,
-  Button,
-  Group,
-  Checkbox,
-  NumberInput,
-  Select,
-} from "@mantine/core";
-import { useState } from "react";
-import CreateMatch from "./createMatchForm";
+import { TextInput, Button, Group, Checkbox, Select } from "@mantine/core";
 
 interface IProps {
   companies: { id: number; name: string }[];
-  wrestlers: { id: number; name: string; wrestlerCompanyId: string }[];
 }
 
-export default function CreatePPV({ companies, wrestlers }: IProps) {
-  const [howManyMatches, setHowManyMatches] = useState(5);
-  const [matches, setMatches] = useState(
-    Array(howManyMatches).fill(null), // Inicjujemy stan jako tablica `null`
-  );
+export default function CreatePPV({ companies }: IProps) {
   const companiesList = companies.map((company) => {
     return { value: company.id.toString(), label: company.name };
   });
-
-  const handleSetMatches = (value, index) => {
-    // Aktualizujemy stan dla konkretnego indexu
-    const updatedMatches = [...matches];
-    updatedMatches[index] = value;
-    setMatches(updatedMatches);
-  };
 
   const form = useForm({
     mode: "uncontrolled",
@@ -45,28 +24,28 @@ export default function CreatePPV({ companies, wrestlers }: IProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <form onSubmit={form.onSubmit((values) => console.log(values))}>
+      <form
+        onSubmit={form.onSubmit(async (values) => {
+          console.log(values);
+          try {
+            const response = await fetch("/api/ppv/", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ values }),
+            });
+            const data = await response.json();
+            console.log("Post stworzony:", data);
+          } catch (error) {
+            console.error("Błąd:", error);
+          }
+        })}
+      >
         <Select
           data={companiesList}
           label="Company"
           placeholder="WWE"
           searchable
         />
-        <NumberInput
-          label="How Many Matches?"
-          placeholder="5"
-          value={howManyMatches}
-          onChange={(e) => {
-            let value = Number(e);
-            if (value > 20) {
-              value = 20;
-            }
-            if (value < 1) {
-              value = 1;
-            }
-            setHowManyMatches(value);
-          }}
-        ></NumberInput>
         <TextInput
           label="PPV Type"
           placeholder="RAW"
@@ -90,13 +69,6 @@ export default function CreatePPV({ companies, wrestlers }: IProps) {
           key={form.key("location")}
           {...form.getInputProps("location")}
         />
-        Match Card:
-        {Array.from({ length: howManyMatches }, (_, index) => (
-          <div key={index}>
-            <h2>Match {index + 1}</h2>
-            <CreateMatch wrestlers={wrestlers} setMatch={handleSetMatches} />
-          </div>
-        ))}
         <Group justify="center" mt="xl">
           <Button type="submit">Create</Button>
         </Group>
